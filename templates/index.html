@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalogação Estratégia Sodré - Polarium API</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #0a0e17;
+            color: #e0e6f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-bottom: 50px;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(20, 70, 160, 0.05) 0%, transparent 25%),
+                radial-gradient(circle at 80% 80%, rgba(30, 110, 240, 0.07) 0%, transparent 35%);
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .card {
+            background-color: rgba(20, 30, 50, 0.7);
+            border: 1px solid rgba(40, 100, 220, 0.3);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 50, 150, 0.2);
+            border-color: rgba(60, 130, 240, 0.5);
+        }
+        .card-header {
+            background-color: rgba(30, 40, 70, 0.7);
+            color: #fff;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(40, 100, 220, 0.3);
+            border-radius: 12px 12px 0 0 !important;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #0d6efd, #0099ff);
+            border: none;
+            box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(13, 110, 253, 0.4);
+            background: linear-gradient(135deg, #0d6efd, #00ccff);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #198754, #20c997);
+            border: none;
+            box-shadow: 0 4px 10px rgba(25, 135, 84, 0.3);
+            transition: all 0.3s ease;
+        }
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(25, 135, 84, 0.4);
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            border: none;
+            box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
+            transition: all 0.3s ease;
+            color: #000;
+        }
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 193, 7, 0.4);
+        }
+        .btn-outline-primary {
+            border-color: #0d6efd;
+            color: #0d6efd;
+            transition: all 0.3s ease;
+        }
+        .btn-outline-primary:hover {
+            background: linear-gradient(135deg, #0d6efd, #0099ff);
+            border-color: transparent;
+            box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+        }
+        .btn-outline-secondary {
+            border-color: #6c757d;
+            color: #aad4ff;
+            transition: all 0.3s ease;
+            background-color: rgba(30, 40, 60, 0.3);
+        }
+        .btn-outline-secondary:hover {
+            background: linear-gradient(135deg, #495057, #6c757d);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3);
+        }
+        .form-control {
+            background-color: rgba(30, 40, 60, 0.5);
+            border: 1px solid rgba(60, 100, 220, 0.3);
+            color: #fff;
+            transition: all 0.3s;
+        }
+        .form-control:focus {
+            background-color: rgba(40, 50, 80, 0.5);
+            color: #fff;
+            border-color: rgba(13, 110, 253, 0.5);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        .form-select {
+            background-color: rgba(30, 40, 60, 0.5);
+            border: 1px solid rgba(60, 100, 220, 0.3);
+            color: #fff;
+        }
+        .form-select:focus {
+            background-color: rgba(40, 50, 80, 0.5);
+            color: #fff;
+            border-color: rgba(13, 110, 253, 0.5);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        .input-group-text {
+            background-color: rgba(25, 35, 60, 0.7);
+            border: 1px solid rgba(60, 100, 220, 0.3);
+            color: #aad4ff;
+        }
+        .table {
+            color: #e0e6f0;
+        }
+        .table thead th {
+            border-color: rgba(60, 100, 220, 0.3);
+            background-color: rgba(30, 40, 70, 0.7);
+            color: #aad4ff;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            padding: 12px;
+        }
+        .table tbody td {
+            border-color: rgba(60, 100, 220, 0.2);
+            vertical-align: middle;
+            padding: 12px;
+        }
+        .table-dark {
+            background-color: rgba(20, 30, 55, 0.3);
+            color: #e0e6f0;
+            margin-bottom: 0;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(40, 100, 220, 0.2);
+        }
+        .win {
+            color: #1f8332;
+            font-weight: bold;
+        }
+        .win-g1 {
+            color: #0d6efd;
+            font-weight: bold;
+        }
+        .win-g2 {
+            color: #ffc107;
+            font-weight: bold;
+        }
+        .loss {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .doji {
+            color: #6c757d;
+            font-weight: bold;
+        }
+        .nulo {
+            color: #ffffff;
+            font-weight: bold;
+        }
+        #chart-container {
+            min-height: 500px;
+            margin-top: 20px;
+            background-color: rgba(15, 25, 45, 0.4);
+            border: 1px solid rgba(40, 100, 220, 0.2);
+            border-radius: 10px;
+            padding: 10px;
+        }
+        .loader {
+            border: 5px solid rgba(30, 40, 70, 0.3);
+            border-top: 5px solid #0d99ff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            box-shadow: 0 0 15px rgba(13, 153, 255, 0.3);
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .legend-item {
+            display: inline-block;
+            margin-right: 15px;
+            background-color: rgba(30, 40, 70, 0.3);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .legend-color {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            margin-right: 5px;
+            vertical-align: middle;
+            border-radius: 3px;
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+        }
+        .legend-green {
+            background-color: green;
+        }
+        .legend-blue {
+            background-color: blue;
+        }
+        .legend-yellow {
+            background-color: yellow;
+        }
+        .legend-red {
+            background-color: red;
+        }
+        .legend-white {
+            background-color: white;
+            border: 1px solid #444;
+        }
+        .page-title {
+            position: relative;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            font-weight: 600;
+            text-shadow: 0 0 20px rgba(13, 110, 253, 0.4);
+        }
+        .page-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, rgba(13, 110, 253, 0.5), rgba(0, 200, 255, 0.8), rgba(13, 110, 253, 0.5));
+            border-radius: 2px;
+        }
+        .badge-ai {
+            background: linear-gradient(135deg, #0d6efd, #00ccff);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        .ai-ranking-btn {
+            background: linear-gradient(135deg, #7928ca, #ff0080);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(121, 40, 202, 0.4);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .ai-ranking-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(121, 40, 202, 0.6);
+        }
+        .ai-ranking-btn .pulse {
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: white;
+            animation: pulse-animation 2s infinite;
+        }
+        @keyframes pulse-animation {
+            0% {
+                box-shadow: 0 0 0 0px rgba(255, 255, 255, 0.8);
+            }
+            100% {
+                box-shadow: 0 0 0 15px rgba(255, 255, 255, 0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4 mb-2 text-center page-title">Catalogação Estratégia Sodré - Polarium API</h1>
+        <div class="text-center mb-4">
+            <span class="badge-ai">
+                <i class="fas fa-robot me-2"></i> Análise por Inteligência Artificial
+            </span>
+        </div>
+        
+        <!-- Card de Login -->
+        <div class="card mb-4" id="login-card">
+            <div class="card-header">
+                Login na Polarium
+            </div>
+            <div class="card-body">
+                <form id="login-form">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Senha</label>
+                        <input type="password" class="form-control" id="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Conectar</button>
+                </form>
+                
+                <!-- Formulário 2FA (inicialmente escondido) -->
+                <form id="2fa-form" style="display: none;" class="mt-3">
+                    <div class="mb-3">
+                        <label for="2fa-code" class="form-label">Código de Autenticação de Dois Fatores</label>
+                        <input type="text" class="form-control" id="2fa-code" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Verificar</button>
+                </form>
+                
+                <div id="login-status" class="mt-3"></div>
+            </div>
+        </div>
+        
+        <!-- Card de Análise (inicialmente escondido) -->
+        <div class="card mb-4" id="analysis-card" style="display: none;">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Análise de Ativos</span>
+                <a href="/top_ativos" class="ai-ranking-btn">
+                    <div class="pulse"></div>
+                    <i class="fas fa-brain me-1"></i>
+                    <i class="fas fa-chart-line me-1"></i>
+                    Ranking IA Top 5 Ativos
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning mb-3" id="disconnected-message" style="display: none;">
+                    Você não está conectado à API Polarium. Por favor, reconecte-se para continuar.
+                </div>
+                <form id="analysis-form">
+                    <div class="mb-3">
+                        <label for="active" class="form-label">Selecione um Ativo</label>
+                        <div class="input-group">
+                            <select class="form-select" id="active" required>
+                                {% for active in actives %}
+                                <option value="{{ active[0] }}">{{ active[1] }}</option>
+                                {% endfor %}
+                            </select>
+                            <button class="btn btn-outline-secondary" type="button" id="refresh-actives">Atualizar Ativos</button>
+                        </div>
+                        <div class="form-text {% if actives|length == 0 %}text-warning{% else %}text-light{% endif %}" id="active-info-text">
+                            {% if actives|length == 0 %}
+                            Nenhum ativo do tipo binary está disponível no momento. Clique em "Atualizar Ativos" para verificar novamente.
+                            {% else %}
+                            {{ actives|length }} ativos binary disponíveis.
+                            {% endif %}
+                        </div>
+                        <div class="alert alert-warning mt-2" id="no-active-warning" {% if actives|length > 0 %}style="display: none;"{% endif %}>
+                            Nenhum ativo binary disponível no momento.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="num_blocks" class="form-label">Quantidade de Quadrantes (1-100)</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="num_blocks" min="1" max="100" value="10" required>
+                            <button class="btn btn-outline-primary" type="button" id="reload-chart">Atualizar Gráfico</button>
+                        </div>
+                        <div class="form-text text-light">Define quantos quadrantes históricos serão analisados.</div>
+                    </div>
+                    <button type="submit" class="btn btn-success">Analisar</button>
+                </form>
+                
+                <div id="analysis-status" class="mt-3"></div>
+                
+                <!-- Legenda do gráfico -->
+                <div class="mt-4 mb-2" id="legend-container" style="display: none;">
+                    <h5>Legenda:</h5>
+                    <div>
+                        <span class="legend-item"><span class="legend-color legend-green"></span> Verde: Vitória na 1ª entrada</span>
+                        <span class="legend-item"><span class="legend-color legend-blue"></span> Azul: Vitória no 1º Martingale</span>
+                        <span class="legend-item"><span class="legend-color legend-yellow"></span> Amarelo: Vitória no 2º Martingale</span>
+                        <span class="legend-item"><span class="legend-color legend-red"></span> Vermelho: Loss</span>
+                        <span class="legend-item"><span class="legend-color legend-white"></span> Branco: Nulo (Doji no Quadrante)</span>
+                    </div>
+                </div>
+                
+                <!-- Contêiner do Gráfico -->
+                <div id="chart-container" style="display: none;"></div>
+                
+                <div class="loader" id="analysis-loader" style="display: none;"></div>
+                
+                <!-- Estatísticas Resumidas -->
+                <div id="stats-container" style="display: none;" class="mt-4 mb-3">
+                    <h4>Resumo de Resultados</h4>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="card bg-success bg-opacity-25 mb-2">
+                                        <div class="card-body text-center">
+                                            <h5>Vitórias 1ª Entrada</h5>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h3 id="win-first-count" class="win mb-0">0</h3>
+                                                <h5 id="win-first-percent" class="win mb-0">(0%)</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card bg-primary bg-opacity-25 mb-2">
+                                        <div class="card-body text-center">
+                                            <h5>Vitórias G1</h5>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h3 id="win-g1-count" class="win-g1 mb-0">0</h3>
+                                                <h5 id="win-g1-percent" class="win-g1 mb-0">(0%)</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card bg-warning bg-opacity-25 mb-2">
+                                        <div class="card-body text-center">
+                                            <h5>Vitórias G2</h5>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h3 id="win-g2-count" class="win-g2 mb-0">0</h3>
+                                                <h5 id="win-g2-percent" class="win-g2 mb-0">(0%)</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card bg-danger bg-opacity-25 mb-2">
+                                        <div class="card-body text-center">
+                                            <h5>Perdas</h5>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h3 id="loss-count" class="loss mb-0">0</h3>
+                                                <h5 id="loss-percent" class="loss mb-0">(0%)</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <div class="card bg-light bg-opacity-10">
+                                        <div class="card-body text-center">
+                                            <h5>Total de Operações</h5>
+                                            <h3 id="total-operations" class="mb-0">0</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card bg-light bg-opacity-10">
+                                        <div class="card-body text-center">
+                                            <h5>Taxa de Acerto</h5>
+                                            <h3 id="win-rate" class="mb-0">0%</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Nova linha para exibir blocos nulos -->
+                            <div class="row mt-3">
+                                <div class="col-md-6 offset-md-3">
+                                    <div class="card bg-dark text-white">
+                                        <div class="card-body text-center">
+                                            <h5>Quadrantes Nulos (Com Doji)</h5>
+                                            <h3 id="nulo-count" class="nulo mb-0">0</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tabela de Resultados -->
+                <div id="results-table-container" style="display: none;" class="mt-4 d-none">
+                    <h4>Resultados dos Quadrantes de 5 Minutos</h4>
+                    <table class="table table-dark table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Horário</th>
+                                <th>Velas Verdes</th>
+                                <th>Velas Vermelhas</th>
+                                <th>Sinal (Minoria)</th>
+                                <th>Resultado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-table-body">
+                            <!-- Resultados serão inseridos aqui via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        $(document).ready(function() {
+            // Verificar se já está conectado
+            {% if connected %}
+            $("#login-card").hide();
+            $("#analysis-card").show();
+            {% endif %}
+            
+            // Manipulador do formulário de login
+            $("#login-form").submit(function(e) {
+                e.preventDefault();
+                
+                const email = $("#email").val();
+                const password = $("#password").val();
+                
+                $("#login-status").html('<div class="alert alert-info">Conectando...</div>');
+                
+                $.ajax({
+                    url: "/connect",
+                    type: "POST",
+                    data: {
+                        email: email,
+                        password: password
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $("#login-status").html('<div class="alert alert-success">' + response.message + '</div>');
+                            setTimeout(function() {
+                                $("#login-card").hide();
+                                $("#analysis-card").show();
+                                
+                                // Esconder mensagens de erro/aviso imediatamente
+                                $("#disconnected-message").hide(); 
+                                $("#no-active-warning").hide(); 
+                                $("#active-info-text").text('Carregando ativos...'); // Mensagem provisória
+                                
+                                // Atualizar a lista de ativos após a conexão
+                                $("#refresh-actives").click();
+                            }, 1500);
+                        } else if (response.require_2fa) {
+                            $("#login-status").html('<div class="alert alert-warning">É necessário verificação de dois fatores.</div>');
+                            $("#2fa-form").show();
+                        } else {
+                            $("#login-status").html('<div class="alert alert-danger">' + response.message + '</div>');
+                        }
+                    },
+                    error: function() {
+                        $("#login-status").html('<div class="alert alert-danger">Erro de conexão com o servidor.</div>');
+                    }
+                });
+            });
+            
+            // Manipulador do formulário 2FA
+            $("#2fa-form").submit(function(e) {
+                e.preventDefault();
+                
+                const code = $("#2fa-code").val();
+                
+                $("#login-status").html('<div class="alert alert-info">Verificando código...</div>');
+                
+                $.ajax({
+                    url: "/verify_2fa",
+                    type: "POST",
+                    data: {
+                        code: code
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $("#login-status").html('<div class="alert alert-success">' + response.message + '</div>');
+                            setTimeout(function() {
+                                $("#login-card").hide();
+                                $("#analysis-card").show();
+                                
+                                // Esconder mensagens de erro/aviso imediatamente
+                                $("#disconnected-message").hide(); 
+                                $("#no-active-warning").hide(); 
+                                $("#active-info-text").text('Carregando ativos...').removeClass('text-warning text-danger').addClass('text-light'); // Mensagem provisória e resetar classes
+                                
+                                // Atualizar a lista de ativos após a conexão 2FA
+                                $("#refresh-actives").click();
+                            }, 1500);
+                        } else {
+                            $("#login-status").html('<div class="alert alert-danger">' + response.message + '</div>');
+                        }
+                    },
+                    error: function() {
+                        $("#login-status").html('<div class="alert alert-danger">Erro de conexão com o servidor.</div>');
+                    }
+                });
+            });
+            
+            // Manipulador do formulário de análise
+            $("#analysis-form").submit(function(e) {
+                e.preventDefault();
+                
+                const active = $("#active").val();
+                
+                $("#analysis-status").html('<div class="alert alert-info">Analisando ' + active + '...</div>');
+                $("#analysis-loader").show();
+                $("#chart-container").hide();
+                $("#results-table-container").hide();
+                
+                $.ajax({
+                    url: "/analyze",
+                    type: "POST",
+                    data: {
+                        active: active,
+                        num_blocks: $("#num_blocks").val()
+                    },
+                    success: function(response) {
+                        $("#analysis-loader").hide();
+                        
+                        if (response.success) {
+                            $("#analysis-status").html('<div class="alert alert-success">Análise completa!</div>');
+                            
+                            // Exibir o gráfico
+                            if (response.chart) {
+                                const chartData = JSON.parse(response.chart);
+                                
+                                // Criar e exibir o gráfico
+                                Plotly.newPlot('chart-container', chartData.data, chartData.layout, {
+                                    displayModeBar: true,
+                                    responsive: true,
+                                    scrollZoom: true
+                                }).then(function() {
+                                    // Forçar autoscale após o gráfico ser completamente carregado
+                                    Plotly.relayout('chart-container', {
+                                        'xaxis.autorange': true,
+                                        'yaxis.autorange': true
+                                    });
+                                });
+                                
+                                $("#chart-container").show();
+                                $("#legend-container").show();
+                            }
+                            
+                            // Preencher estatísticas 
+                            if (response.results && response.results.data) {
+                                populateResultsTable(response.results.data);
+                            } else if (response.data) {
+                                // Compatibilidade com versões anteriores
+                                populateResultsTable(response.data);
+                            }
+                        } else {
+                            $("#analysis-status").html('<div class="alert alert-danger">' + response.message + '</div>');
+                        }
+                    },
+                    error: function() {
+                        $("#analysis-loader").hide();
+                        $("#analysis-status").html('<div class="alert alert-danger">Erro de conexão com o servidor.</div>');
+                    }
+                });
+            });
+            
+            // Botão de atualizar apenas o gráfico
+            $("#reload-chart").click(function() {
+                const active = $("#active").val();
+                const numBlocks = $("#num_blocks").val();
+                
+                if (!active) return;
+                
+                $("#chart-container").hide();
+                $("#analysis-loader").show();
+                
+                $.ajax({
+                    url: "/reload_chart",
+                    type: "POST",
+                    data: {
+                        active: active,
+                        num_blocks: numBlocks
+                    },
+                    success: function(response) {
+                        $("#analysis-loader").hide();
+                        
+                        if (response.success) {
+                            if (response.chart) {
+                                const chartData = JSON.parse(response.chart);
+                                
+                                // Criar e exibir o gráfico
+                                Plotly.newPlot('chart-container', chartData.data, chartData.layout, {
+                                    displayModeBar: true,
+                                    responsive: true,
+                                    scrollZoom: true
+                                }).then(function() {
+                                    // Forçar autoscale após o gráfico ser completamente carregado
+                                    Plotly.relayout('chart-container', {
+                                        'xaxis.autorange': true,
+                                        'yaxis.autorange': true
+                                    });
+                                });
+                                
+                                $("#chart-container").show();
+                                $("#legend-container").show();
+                            }
+                            
+                            // Se a resposta incluir os dados completos, atualize as estatísticas
+                            if (response.results && response.results.data) {
+                                populateResultsTable(response.results.data);
+                            } else if (response.data) {
+                                // Compatibilidade com versões anteriores
+                                populateResultsTable(response.data);
+                            }
+                        } else {
+                            $("#analysis-status").html('<div class="alert alert-danger">' + response.message + '</div>');
+                        }
+                    },
+                    error: function() {
+                        $("#analysis-loader").hide();
+                        $("#analysis-status").html('<div class="alert alert-danger">Erro ao atualizar o gráfico.</div>');
+                    }
+                });
+            });
+            
+            // Botão para atualizar a lista de ativos
+            $("#refresh-actives").click(function() {
+                $("#analysis-status").html('<div class="alert alert-info">Atualizando lista de ativos...</div>');
+                
+                $.ajax({
+                    url: "/refresh_actives",
+                    type: "POST",
+                    success: function(response) {
+                        const selectElement = $("#active");
+                        const activeInfoText = $("#active-info-text"); // Selecionar o elemento de texto informativo
+                        const noActiveWarning = $("#no-active-warning"); // Selecionar o aviso de nenhum ativo
+                        const disconnectedMsg = $("#disconnected-message"); // Selecionar aviso de desconectado
+                        
+                        selectElement.empty(); // Limpar lista atual
+                        
+                        if (response.success) {
+                            // Esconder mensagem de desconectado se a busca teve sucesso
+                            disconnectedMsg.hide();
+                            
+                            response.actives.forEach(function(active) {
+                                // Verificar se o ativo é um objeto com id e name
+                                if (active && typeof active === 'object' && active.id && active.name) {
+                                    selectElement.append($('<option>', {
+                                        value: active.id,    // ID do ativo para uso interno
+                                        text: active.name    // Nome formatado para exibição
+                                    }));
+                                } 
+                                // Compatibilidade com formato antigo (array)
+                                else if (Array.isArray(active) && active.length === 2) {
+                                    selectElement.append($('<option>', {
+                                        value: active[0],    // Valor original para uso interno
+                                        text: active[1]      // Texto formatado para exibição
+                                    }));
+                                } 
+                                // Fallback para strings simples
+                                else {
+                                    selectElement.append($('<option>', {
+                                        value: active,
+                                        text: active
+                                    }));
+                                }
+                            });
+                            
+                            if (response.actives.length > 0) {
+                                $("#analysis-status").html('<div class="alert alert-success">' + response.actives.length + ' ativos disponíveis!</div>');
+                                activeInfoText.text(response.actives.length + ' ativos binary disponíveis.').removeClass('text-warning').addClass('text-light');
+                                noActiveWarning.hide(); // Esconder aviso de nenhum ativo
+                            } else {
+                                $("#analysis-status").html('<div class="alert alert-warning">Nenhum ativo binary disponível no momento.</div>');
+                                activeInfoText.text('Nenhum ativo do tipo binary está disponível no momento. Clique em "Atualizar Ativos" para verificar novamente.').removeClass('text-light').addClass('text-warning');
+                                noActiveWarning.show(); // Mostrar aviso de nenhum ativo
+                            }
+                        } else {
+                            $("#analysis-status").html('<div class="alert alert-danger">' + response.message + '</div>');
+                            activeInfoText.text('Erro ao atualizar ativos.').removeClass('text-light').addClass('text-danger');
+                            noActiveWarning.show(); // Mostrar aviso em caso de erro
+                            // Não mostrar disconnectedMsg aqui, pois o erro pode ser outro
+                        }
+                    },
+                    error: function() {
+                        $("#analysis-status").html('<div class="alert alert-danger">Erro de conexão com o servidor ao atualizar ativos.</div>');
+                        // Manter mensagens de erro visíveis se a conexão falhar
+                    }
+                });
+            });
+            
+            // Função para preencher a tabela de resultados
+            function populateResultsTable(data) {
+                const tbody = $("#results-table-body");
+                tbody.empty();
+                
+                // Contadores para estatísticas
+                let winFirstCount = 0;
+                let winG1Count = 0;
+                let winG2Count = 0;
+                let lossCount = 0;
+                let nuloCount = 0;
+                let totalOperations = 0;
+                
+                data.forEach(function(block) {
+                    let resultClass = '';
+                    let resultText = 'Pendente';
+                    
+                    // Contar apenas blocos com resultados definidos
+                    if (block.result) {
+                        totalOperations++;
+                        
+                        if (block.result === "WIN" && block.martingale === 0) {
+                            resultClass = 'win';
+                            resultText = 'WIN (1ª Entrada)';
+                            winFirstCount++;
+                        } else if (block.result === "WIN" && block.martingale === 1) {
+                            resultClass = 'win-g1';
+                            resultText = 'WIN (G1)';
+                            winG1Count++;
+                        } else if (block.result === "WIN" && block.martingale === 2) {
+                            resultClass = 'win-g2';
+                            resultText = 'WIN (G2)';
+                            winG2Count++;
+                        } else if (block.result === "LOSS") {
+                            resultClass = 'loss';
+                            resultText = 'LOSS';
+                            lossCount++;
+                        } else if (block.result === "NULO") {
+                            resultClass = 'nulo';
+                            resultText = 'NULO (Doji no Quadrante)';
+                            nuloCount++;
+                            // Não contar como operação nas estatísticas
+                            totalOperations--;
+                        }
+                    } else if (block.signal === "DOJI") {
+                        resultClass = 'doji';
+                        resultText = 'DOJI (Empate)';
+                    }
+                    
+                    tbody.append(
+                        '<tr>' +
+                        '<td>' + block.time_str + '</td>' +
+                        '<td>' + block.verde_count + '</td>' +
+                        '<td>' + block.vermelha_count + '</td>' +
+                        '<td>' + block.signal + '</td>' +
+                        '<td class="' + resultClass + '">' + resultText + '</td>' +
+                        '</tr>'
+                    );
+                });
+                
+                // Calcular porcentagens
+                const calcPercent = (value, total) => total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                
+                // Atualizar estatísticas
+                $("#win-first-count").text(winFirstCount);
+                $("#win-g1-count").text(winG1Count);
+                $("#win-g2-count").text(winG2Count);
+                $("#loss-count").text(lossCount);
+                $("#nulo-count").text(nuloCount);
+                
+                $("#win-first-percent").text(`(${calcPercent(winFirstCount, totalOperations)}%)`);
+                $("#win-g1-percent").text(`(${calcPercent(winG1Count, totalOperations)}%)`);
+                $("#win-g2-percent").text(`(${calcPercent(winG2Count, totalOperations)}%)`);
+                $("#loss-percent").text(`(${calcPercent(lossCount, totalOperations)}%)`);
+                
+                $("#total-operations").text(totalOperations);
+                
+                const totalWins = winFirstCount + winG1Count + winG2Count;
+                $("#win-rate").text(`${calcPercent(totalWins, totalOperations)}%`);
+                
+                // Mostrar container de estatísticas
+                if (totalOperations > 0 || nuloCount > 0) {
+                    $("#stats-container").show();
+                } else {
+                    $("#stats-container").hide();
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

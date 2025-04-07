@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking Inteligente - Estratégia Sodré Analytics</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            background-color: #0a0e17;
+            color: #e0e6f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-bottom: 50px;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(20, 70, 160, 0.05) 0%, transparent 25%),
+                radial-gradient(circle at 80% 80%, rgba(30, 110, 240, 0.07) 0%, transparent 35%);
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .card {
+            background-color: rgba(20, 30, 50, 0.7);
+            border: 1px solid rgba(40, 100, 220, 0.3);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 50, 150, 0.2);
+            border-color: rgba(60, 130, 240, 0.5);
+        }
+        .card-header {
+            background-color: rgba(30, 40, 70, 0.7);
+            color: #fff;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(40, 100, 220, 0.3);
+            border-radius: 12px 12px 0 0 !important;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #0d6efd, #0099ff);
+            border: none;
+            box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(13, 110, 253, 0.4);
+            background: linear-gradient(135deg, #0d6efd, #00ccff);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #198754, #20c997);
+            border: none;
+            box-shadow: 0 4px 10px rgba(25, 135, 84, 0.3);
+            transition: all 0.3s ease;
+        }
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(25, 135, 84, 0.4);
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            border: none;
+            box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
+            transition: all 0.3s ease;
+            color: #000;
+        }
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 193, 7, 0.4);
+        }
+        .btn-outline-primary {
+            border-color: #0d6efd;
+            color: #0d6efd;
+            transition: all 0.3s ease;
+        }
+        .btn-outline-primary:hover {
+            background: linear-gradient(135deg, #0d6efd, #0099ff);
+            border-color: transparent;
+            box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+        }
+        .asset-card {
+            background-color: rgba(25, 35, 60, 0.8);
+            border: 1px solid rgba(40, 100, 220, 0.3);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+        .asset-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 30, 100, 0.25);
+            border-color: rgba(60, 130, 240, 0.5);
+        }
+        .asset-position {
+            background-color: rgba(30, 40, 70, 0.7);
+            color: #ffffff;
+            padding: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 1px solid rgba(40, 100, 220, 0.3);
+        }
+        .asset-name {
+            background-color: rgba(35, 45, 75, 0.7);
+            color: #ffffff;
+            padding: 12px 15px;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 1px solid rgba(40, 100, 220, 0.3);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+        .asset-stats {
+            padding: 20px;
+            background-color: rgba(20, 30, 55, 0.6);
+        }
+        .win-rate {
+            font-size: 36px;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 0;
+            text-shadow: 0 0 15px rgba(31, 131, 50, 0.4);
+        }
+        .win {
+            color: #1f8332;
+        }
+        .win-g1 {
+            color: #0d6efd;
+        }
+        .win-g2 {
+            color: #ffc107;
+        }
+        .loss {
+            color: #dc3545;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #aad4ff;
+        }
+        .stat-value {
+            font-weight: bold;
+            font-size: 18px;
+            color: #ffffff;
+        }
+        .gold {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+        }
+        .silver {
+            background: linear-gradient(135deg, #C0C0C0, #A9A9A9);
+            color: #000;
+        }
+        .bronze {
+            background: linear-gradient(135deg, #CD7F32, #8B4513);
+            color: #fff;
+        }
+        .refresh-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.5);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0d6efd, #0099ff);
+            border: none;
+            transition: all 0.3s ease;
+        }
+        .refresh-button:hover {
+            transform: rotate(30deg) scale(1.1);
+            box-shadow: 0 6px 20px rgba(13, 110, 253, 0.6);
+        }
+        .nav-buttons {
+            margin-bottom: 20px;
+        }
+        .last-update {
+            font-size: 12px;
+            color: #8fccff;
+            text-align: center;
+            margin-top: 5px;
+        }
+        .no-data {
+            text-align: center;
+            padding: 50px 0;
+        }
+        .table-dark {
+            background-color: rgba(20, 30, 55, 0.3);
+            color: #e0e6f0;
+            margin-bottom: 0;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(40, 100, 220, 0.2);
+        }
+        .table-dark thead th {
+            background-color: rgba(30, 40, 70, 0.7);
+            border-color: rgba(40, 100, 220, 0.3);
+            font-size: 14px;
+            font-weight: normal;
+            color: #aad4ff;
+            text-transform: uppercase;
+            padding: 12px;
+        }
+        .table-dark tbody td {
+            border-color: rgba(40, 100, 220, 0.2);
+            vertical-align: middle;
+            padding: 12px;
+        }
+        .table-secondary.text-dark td {
+            background-color: rgba(60, 90, 150, 0.3) !important;
+            color: white !important;
+            border-color: rgba(40, 100, 220, 0.3);
+        }
+        .page-title {
+            position: relative;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            font-weight: 600;
+            text-shadow: 0 0 20px rgba(13, 110, 253, 0.4);
+        }
+        .page-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, rgba(13, 110, 253, 0.5), rgba(0, 200, 255, 0.8), rgba(13, 110, 253, 0.5));
+            border-radius: 2px;
+        }
+        .badge-ai {
+            background: linear-gradient(135deg, #0d6efd, #00ccff);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .ai-chip {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(13, 110, 253, 0.1);
+            border: 1px solid rgba(13, 110, 253, 0.3);
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+        .ai-chip i {
+            margin-right: 5px;
+            color: #0d99ff;
+        }
+        
+        .ai-pulse {
+            position: relative;
+        }
+        
+        .ai-pulse::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: rgba(13, 110, 253, 0.4);
+            z-index: -1;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.7;
+            }
+            70% {
+                transform: translate(-50%, -50%) scale(1.5);
+                opacity: 0;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.5);
+                opacity: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .asset-position {
+                font-size: 20px;
+            }
+            .asset-name {
+                font-size: 16px;
+            }
+            .win-rate {
+                font-size: 28px;
+            }
+            .stat-value {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4 mb-2 text-center page-title">Ranking Inteligente da Estratégia Sodré</h1>
+        <div class="text-center mb-4">
+            <span class="badge-ai">
+                <i class="fas fa-robot me-2"></i> Análise Avançada por Inteligência Artificial
+            </span>
+        </div>
+        <div class="text-center mb-4">
+            <p class="text-light">Os ativos abaixo foram selecionados automaticamente pela nossa IA como os mais lucrativos para a Estratégia Sodré</p>
+        </div>
+        
+        <!-- Botões de navegação -->
+        <div class="nav-buttons text-center">
+            <a href="/" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Voltar para Análise
+            </a>
+            <button id="refresh-btn" class="btn btn-success ms-2">
+                <i class="fas fa-sync-alt me-2"></i>Atualizar Ranking
+            </button>
+            
+            <button id="clear-ranking-btn" class="btn btn-danger ms-2">
+                <i class="fas fa-trash-alt me-2"></i>Limpar Ranking
+            </button>
+            
+            <button id="toggle-ranking-btn" class="btn btn-info ms-2" data-bs-toggle="tooltip" title="Controla se o ranking deve ser atualizado automaticamente após análises individuais">
+                <i class="fas fa-cog me-2"></i><span id="toggle-text">Manter Limpo</span>
+            </button>
+            
+            <div class="d-inline-block mx-2">
+                <div class="input-group">
+                    <span class="input-group-text bg-dark text-white" data-bs-toggle="tooltip" title="Mais quadrantes = Análise mais precisa, porém mais lenta">
+                        <i class="fas fa-chart-bar me-1"></i>Quadrantes
+                    </span>
+                    <select id="num_quadrantes" class="form-select bg-dark text-white" style="width: 70px;" data-bs-toggle="tooltip" title="Define quantos quadrantes históricos serão analizados para cada ativo">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button id="analyze-top5-btn" class="btn btn-warning ms-2">
+                <i class="fas fa-brain me-2"></i>Análise Completa Inteligente
+            </button>
+        </div>
+        
+        <!-- Mensagem se API não estiver conectada -->
+        {% if not connected %}
+        <div class="alert alert-warning text-center">
+            <i class="fas fa-exclamation-triangle me-2"></i>Você não está conectado à API Polarium. Por favor, volte à página principal para conectar-se primeiro.
+        </div>
+        {% endif %}
+        
+        <!-- Mensagem se não houver dados suficientes -->
+        {% if connected and top5|length == 0 %}
+        <div class="card">
+            <div class="card-body no-data">
+                <h4><i class="fas fa-robot me-2"></i>Para visualizar o ranking dos melhores ativos, siga os passos abaixo:</h4>
+                <ol class="text-start mt-3">
+                    <li>Clique no botão <strong class="text-warning">"Análise Completa Inteligente"</strong> acima</li>
+                    <li>Aguarde a análise ser concluída (pode levar alguns minutos)</li>
+                    <li>O ranking será automaticamente atualizado após a conclusão</li>
+                </ol>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Exibição dos top 5 ativos -->
+        <div class="row mt-4">
+            {% for asset in top5 %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="asset-card">
+                        <!-- Posição no ranking com cores diferentes -->
+                        <div class="asset-position {% if loop.index == 1 %}gold{% elif loop.index == 2 %}silver{% elif loop.index == 3 %}bronze{% endif %}">
+                            {% if loop.index == 1 %}
+                                <i class="fas fa-crown me-2"></i>
+                            {% elif loop.index == 2 %}
+                                <i class="fas fa-medal me-2"></i>
+                            {% elif loop.index == 3 %}
+                                <i class="fas fa-award me-2"></i>
+                            {% else %}
+                                <i class="fas fa-star me-2"></i>
+                            {% endif %}
+                            #{{ loop.index }}
+                        </div>
+                        <!-- Nome do ativo -->
+                        <div class="asset-name">
+                            {{ asset.name }}
+                            <span class="ai-chip"><i class="fas fa-check-circle ai-pulse"></i> Seleção IA</span>
+                        </div>
+                        <!-- Taxa de acerto (grande e destacada) -->
+                        <div class="win-rate">
+                            {{ "%.1f"|format(asset.win_rate) }}%
+                        </div>
+                        <!-- Estatísticas detalhadas - NOVO DESIGN DE TABELA -->
+                        <div class="asset-stats">
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <div class="stats-container" style="background-color: rgba(15, 25, 45, 0.7); border-radius: 10px; overflow: hidden; border: 1px solid rgba(40, 100, 220, 0.25);">
+                                        <!-- Cabeçalho da tabela -->
+                                        <div class="stats-header d-flex" style="background: linear-gradient(90deg, rgba(20, 30, 60, 0.9), rgba(30, 50, 100, 0.9)); padding: 10px 15px; border-bottom: 1px solid rgba(40, 100, 220, 0.25);">
+                                            <div class="flex-grow-1 text-start">
+                                                <span style="color: #aad4ff; font-size: 14px; text-transform: uppercase; font-weight: 500;">
+                                                    <i class="fas fa-chart-line me-1"></i> Resultado
+                                                </span>
+                                            </div>
+                                            <div class="text-center" style="width: 80px;">
+                                                <span style="color: #aad4ff; font-size: 14px; text-transform: uppercase; font-weight: 500;">
+                                                    <i class="fas fa-hashtag me-1"></i> Qtd
+                                                </span>
+                                            </div>
+                                            <div class="text-center" style="width: 100px;">
+                                                <span style="color: #aad4ff; font-size: 14px; text-transform: uppercase; font-weight: 500;">
+                                                    <i class="fas fa-percentage me-1"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Linhas de dados -->
+                                        <div class="stats-row d-flex align-items-center" style="padding: 12px 15px; border-bottom: 1px solid rgba(40, 100, 220, 0.15); transition: all 0.2s ease;">
+                                            <div class="flex-grow-1 text-start">
+                                                <span class="win" style="font-weight: 600;">
+                                                    <i class="fas fa-check-circle me-1"></i> Vitórias 1ª Entrada
+                                                </span>
+                                            </div>
+                                            <div class="text-center win" style="width: 80px; font-weight: 600;">
+                                                {{ asset.win_first }}
+                                            </div>
+                                            <div class="text-center win" style="width: 100px; font-weight: 600;">
+                                                {{ (asset.win_first / asset.total_operations * 100)|round(1) if asset.total_operations > 0 else 0 }}%
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="stats-row d-flex align-items-center" style="padding: 12px 15px; border-bottom: 1px solid rgba(40, 100, 220, 0.15); transition: all 0.2s ease;">
+                                            <div class="flex-grow-1 text-start">
+                                                <span class="win-g1" style="font-weight: 600;">
+                                                    <i class="fas fa-sync-alt me-1"></i> Vitórias G1
+                                                </span>
+                                            </div>
+                                            <div class="text-center win-g1" style="width: 80px; font-weight: 600;">
+                                                {{ asset.win_g1 }}
+                                            </div>
+                                            <div class="text-center win-g1" style="width: 100px; font-weight: 600;">
+                                                {{ (asset.win_g1 / asset.total_operations * 100)|round(1) if asset.total_operations > 0 else 0 }}%
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="stats-row d-flex align-items-center" style="padding: 12px 15px; border-bottom: 1px solid rgba(40, 100, 220, 0.15); transition: all 0.2s ease;">
+                                            <div class="flex-grow-1 text-start">
+                                                <span class="win-g2" style="font-weight: 600;">
+                                                    <i class="fas fa-sync-alt me-1"></i> Vitórias G2
+                                                </span>
+                                            </div>
+                                            <div class="text-center win-g2" style="width: 80px; font-weight: 600;">
+                                                {{ asset.win_g2 }}
+                                            </div>
+                                            <div class="text-center win-g2" style="width: 100px; font-weight: 600;">
+                                                {{ (asset.win_g2 / asset.total_operations * 100)|round(1) if asset.total_operations > 0 else 0 }}%
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="stats-row d-flex align-items-center" style="padding: 12px 15px; border-bottom: 1px solid rgba(40, 100, 220, 0.15); transition: all 0.2s ease;">
+                                            <div class="flex-grow-1 text-start">
+                                                <span class="loss" style="font-weight: 600;">
+                                                    <i class="fas fa-times-circle me-1"></i> Perdas
+                                                </span>
+                                            </div>
+                                            <div class="text-center loss" style="width: 80px; font-weight: 600;">
+                                                {{ asset.loss }}
+                                            </div>
+                                            <div class="text-center loss" style="width: 100px; font-weight: 600;">
+                                                {{ (asset.loss / asset.total_operations * 100)|round(1) if asset.total_operations > 0 else 0 }}%
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Linha de total -->
+                                        <div class="stats-row d-flex align-items-center" style="padding: 12px 15px; background: linear-gradient(90deg, rgba(30, 50, 100, 0.3), rgba(40, 70, 130, 0.3)); font-weight: 700;">
+                                            <div class="flex-grow-1 text-start">
+                                                <span style="color: white;">
+                                                    <i class="fas fa-calculator me-1"></i> TOTAL
+                                                </span>
+                                            </div>
+                                            <div class="text-center" style="width: 80px; color: white;">
+                                                {{ asset.total_operations }}
+                                            </div>
+                                            <div class="text-center" style="width: 100px; color: white;">
+                                                100%
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Linha do Total de Operações - usamos um indicador mais discreto -->
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-center align-items-center mt-2 mb-2">
+                                        <div class="last-update">
+                                            <i class="fas fa-clock me-1"></i> Última atualização: {{ asset.last_update|int|strftime('%H:%M:%S') }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Botão de atualização fixo -->
+        <a href="javascript:void(0)" id="refresh-btn-fixed" class="btn btn-primary btn-lg refresh-button d-none d-md-block">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+            </svg>
+        </a>
+    </div>
+    
+    <script>
+        $(document).ready(function() {
+            // Inicializar tooltips do Bootstrap
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+            
+            // Função para formatar a data/hora
+            function formatDateTime(timestamp) {
+                const date = new Date(timestamp * 1000);
+                return date.toLocaleTimeString();
+            }
+            
+            // Atualizar o ranking com AJAX
+            function refreshRanking() {
+                $("#refresh-btn, #refresh-btn-fixed").prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Atualizando...');
+                
+                // Para garantir que a atualização mostre dados atualizados, precisamos recarregar a página
+                setTimeout(function() {
+                    window.location.reload();
+                }, 500);
+            }
+            
+            // Ativar botões de atualização
+            $("#refresh-btn, #refresh-btn-fixed").click(function(e) {
+                e.preventDefault();
+                refreshRanking();
+            });
+            
+            // Botão para analisar top 5 ativos automaticamente
+            $("#analyze-top5-btn").click(function() {
+                $(this).prop('disabled', true); // Desabilitar o botão durante a análise
+                $(this).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Analisando...');
+                
+                // Criar overlay de loading com barra de progresso
+                $("body").append('<div id="loading-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(8,10,20,0.9); z-index: 1050; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px);">' + 
+                    '<div class="text-center text-white p-4" style="max-width: 800px; width: 94%; background-color: rgba(20,30,60,0.7); border-radius: 12px; border: 1px solid rgba(50,120,220,0.4); box-shadow: 0 0 30px rgba(0,150,255,0.15); backdrop-filter: blur(10px);">' +
+                    '<div style="position:relative; display:inline-block; margin-bottom: 15px;">' +
+                    '  <i class="fas fa-robot" style="font-size: 48px; color: #0d99ff; filter: drop-shadow(0 0 8px rgba(13,153,255,0.7));"></i>' +
+                    '  <div style="position: absolute; top: -8px; right: -8px; width: 20px; height: 20px;" class="d-flex align-items-center justify-content-center">' +
+                    '    <span class="spinner-grow spinner-grow-sm text-info" style="opacity: 0.8"></span>' +
+                    '  </div>' +
+                    '</div>' +
+                    '<h3 class="mb-4" style="font-weight: 600; text-shadow: 0 0 15px rgba(0,150,255,0.5);">Inteligência Artificial Analisando Ativos</h3>' +
+                    '<div class="d-inline-block mb-3 px-3 py-2" style="background: rgba(30,40,70,0.7); border-radius: 20px; border: 1px solid rgba(100,160,255,0.4); box-shadow: 0 0 10px rgba(0,70,150,0.2);">' +
+                    '  <span style="font-size: 15px; color: #ffffff; font-weight: 500;"><i class="fas fa-chart-line me-2"></i>' + $("#num_quadrantes").val() + ' quadrantes por ativo</span>' +
+                    '</div>' +
+                    '<div class="mb-4" style="position: relative; min-height: 28px; border-left: 3px solid rgba(13,110,253,0.4); padding-left: 15px;">' +
+                    '  <div id="ai-analyzing-cursor" style="position: absolute; left: 15px; opacity: 1;">|</div>' +
+                    '  <div id="ai-analyzing-message" style="color: #8fccff; font-family: monospace; font-size: 15px; text-align: left;">A IA está selecionando os ativos mais promissores para análise rápida...</div>' +
+                    '</div>' +
+                    '<div class="progress mb-3" style="height: 12px; background: rgba(30,40,70,0.5); border-radius: 20px; overflow: hidden;">' +
+                    '  <div id="progress-bar-main" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%; background: linear-gradient(90deg, #0d6efd 0%, #00c2ff 100%);" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>' +
+                    '</div>' +
+                    '<div class="d-flex justify-content-between px-2 mb-4" style="color: #8fccff; font-size: 12px;">' +
+                    '  <div><i class="fas fa-hourglass-start me-1"></i> Iniciando</div>' +
+                    '  <div><i class="fas fa-hourglass-half me-1"></i> Analisando</div>' +
+                    '  <div><i class="fas fa-hourglass-end me-1"></i> Finalizando</div>' +
+                    '</div>' +
+                    '<div id="analysis-results" class="mb-4" style="max-width: 100%; max-height: 300px; overflow-y: auto; text-align: left;"></div>' +
+                    '<div id="button-container">' +
+                    '  <button id="cancel-analysis-btn" class="btn btn-danger" style="border-radius: 20px; padding: 8px 20px; box-shadow: 0 0 15px rgba(220,53,69,0.5);">' +
+                    '    <i class="fas fa-times-circle me-2"></i>Cancelar Análise' +
+                    '  </button>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>');
+                
+                // Animar cursor piscando
+                setInterval(function() {
+                    $("#ai-analyzing-cursor").fadeToggle(500);
+                }, 500);
+                
+                // Mensagens de análise da IA para mostrar em sequência
+                const aiMessages = [
+                    "Analisando os ativos mais promissores para encontrar os melhores resultados...",
+                    "Aplicando algoritmos de seleção para identificar os melhores candidatos...",
+                    "Processando padrões de mercado dos ativos selecionados...",
+                    "Calculando taxas de acerto para os ativos prioritários...",
+                    "Usando análise preditiva para identificar os ativos com maior potencial...",
+                    "Otimizando a seleção baseada nos padrões da Estratégia Sodré...",
+                    "Finalizando a análise dos ativos mais promissores...",
+                    "Verificando formações de minoria nos últimos quadrantes de mercado...",
+                    "Analisando inversões de tendência em blocos de 5 minutos...",
+                    "Calculando probabilidade de retorno em entradas contrárias à maioria...",
+                    "Aplicando filtros de volatilidade para seleção dos melhores ativos...",
+                    "Identificando sequências de velas favoráveis à estratégia da minoria...",
+                    "Analisando comportamento do mercado nos horários de maior liquidez...",
+                    "Cruzando dados de performance com histórico de acertos anteriores...",
+                    "Mapeando correlação entre diferentes pares de moedas e ativos...",
+                    "Verificando eficiência do primeiro nível de martingale nos ativos...",
+                    "Aplicando modelos estatísticos para previsão de tendências futuras...",
+                    "Comparando performance entre ativos OTC e de mercado aberto...",
+                    "Analisando consistência de resultados em diferentes ativos...",
+                    "Medindo eficácia da estratégia em diferentes ciclos de mercado...",
+                    "Calculando distâncias médias entre suportes e resistências...",
+                    "Detectando padrões de reversão nos blocos de 5 minutos...",
+                    "Analisando eficácia do martingale de nível 2 nos diferentes ativos...",
+                    "Avaliando performance em horários de alta volatilidade...",
+                    "Processando histórico de formações de velas nos blocos analisados...",
+                    "Identificando momentos ótimos para entrada baseados na minoria...",
+                    "Comparando resultados históricos com projeções futuras...",
+                    "Verificando estabilidade de preços nos períodos analisados...",
+                    "Processando indicadores técnicos complementares à estratégia da minoria..."
+                ];
+                
+                // Função para efeito de digitação nas mensagens
+                function typeWriter(text, elementId, speed = 30) {
+                    let i = 0;
+                    $("#" + elementId).text("");
+                    function typing() {
+                        if (i < text.length) {
+                            $("#" + elementId).text($("#" + elementId).text() + text.charAt(i));
+                            i++;
+                            setTimeout(typing, speed);
+                        }
+                    }
+                    typing();
+                }
+                
+                let messageIndex = 0;
+                // Alternar mensagens de análise com efeito de digitação
+                const messageInterval = setInterval(function() {
+                    messageIndex = (messageIndex + 1) % aiMessages.length;
+                    // Usar text() em vez de typeWriter para evitar bugs de texto
+                    $("#ai-analyzing-message").text(aiMessages[messageIndex]);
+                }, 3000);
+                
+                let analyzedCount = 0;
+                let overallProgress = 0;
+                
+                // Consultar o progresso da análise a cada segundo
+                const progressInterval = setInterval(function() {
+                    $.ajax({
+                        url: "/get_analysis_progress",
+                        type: "GET",
+                        success: function(progress) {
+                            if (progress.in_progress) {
+                                // Atualizar barra de progresso
+                                overallProgress = progress.percent_complete;
+                                $("#progress-bar-main").css("width", overallProgress + "%").text(overallProgress + "%");
+                            }
+                        }
+                    });
+                }, 1000);
+                
+                // Adicionar evento ao botão de cancelar análise
+                $("#cancel-analysis-btn").click(function() {
+                    if (confirm("Tem certeza que deseja cancelar a análise atual?")) {
+                        $(this).prop("disabled", true).html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Cancelando...');
+                        
+                        // Fazer requisição para cancelar análise
+                        $.ajax({
+                            url: "/cancel_analysis",
+                            type: "POST",
+                            success: function(response) {
+                                if (response.success) {
+                                    // Usar .text() em vez de typeWriter para evitar bugs no texto
+                                    $("#ai-analyzing-message").text("Análise cancelada pelo usuário.");
+                                    $("#progress-bar-main").removeClass("progress-bar-striped progress-bar-animated").addClass("bg-danger");
+                                    
+                                    // Substituir o botão de cancelar pelo botão fechar (em vez de remover)
+                                    $("#button-container").html('<button id="close-canceled-overlay" class="btn btn-primary" style="background: linear-gradient(90deg, #0d6efd 0%, #0dcaf0 100%); border: none; border-radius: 20px; padding: 8px 20px; box-shadow: 0 0 15px rgba(13,110,253,0.5);">Fechar</button>');
+                                    
+                                    // Adicionar evento ao botão
+                                    $("#close-canceled-overlay").click(function() {
+                                        $("#loading-overlay").remove();
+                                        $("#analyze-top5-btn").prop('disabled', false).text('Análise Completa Inteligente');
+                                    });
+                                } else {
+                                    alert("Erro ao cancelar análise: " + (response.error || "Erro desconhecido"));
+                                    $("#cancel-analysis-btn").prop("disabled", false).html('<i class="fas fa-times-circle me-2"></i>Cancelar Análise');
+                                }
+                            },
+                            error: function() {
+                                alert("Erro de conexão ao tentar cancelar a análise");
+                                $("#cancel-analysis-btn").prop("disabled", false).html('<i class="fas fa-times-circle me-2"></i>Cancelar Análise');
+                            }
+                        });
+                    }
+                });
+                
+                // Fazer requisição AJAX para analisar todos os ativos
+                $.ajax({
+                    url: "/analyze_top5",
+                    type: "POST",
+                    data: {
+                        num_blocks: $("#num_quadrantes").val()
+                    },
+                    success: function(response) {
+                        clearInterval(messageInterval); // Parar a alternância de mensagens
+                        clearInterval(progressInterval); // Parar consulta de progresso
+                        
+                        console.log("Análise concluída, resposta:", response);
+                        
+                        if (response.success) {
+                            // Verificar se a análise foi cancelada pelo usuário
+                            if (response.canceled) {
+                                // Mostrar mensagem de cancelamento no overlay
+                                $("#ai-analyzing-message").text("Análise cancelada. Mostrando os melhores ativos encontrados até o momento.");
+                                $("#progress-bar-main").css("width", "100%").text("100%").removeClass("bg-warning").addClass("bg-secondary");
+                            } else {
+                                // Mostrar mensagem de sucesso no overlay
+                                $("#ai-analyzing-message").text("Análise inteligente concluída com sucesso! A IA identificou os 5 ativos com maior potencial.");
+                                $("#progress-bar-main").css("width", "100%").text("100%").removeClass("bg-warning").addClass("bg-success");
+                            }
+                            
+                            // Exibir resultados detalhados
+                            let resultsHtml = '<div class="card bg-dark border-info">' +
+                                '<div class="card-header bg-info bg-opacity-25 text-white"><i class="fas fa-chart-pie me-2"></i>Resultados da Análise</div>' +
+                                '<div class="card-body">' +
+                                '<table class="table table-dark table-sm table-hover border-info">' +
+                                '<thead><tr><th>Ativo</th><th>Resultado</th></tr></thead>' +
+                                '<tbody>';
+                            
+                            if (response.results) {
+                                for (const [ativo, resultado] of Object.entries(response.results)) {
+                                    if (ativo !== "canceled") { // Não mostrar a flag de cancelamento na tabela
+                                        const isSuccess = resultado === "Sucesso";
+                                        resultsHtml += '<tr>' +
+                                            '<td><i class="' + (isSuccess ? 'fas fa-check-circle text-success me-2' : 'fas fa-times-circle text-danger me-2') + '"></i>' + ativo + '</td>' +
+                                            '<td class="' + (isSuccess ? 'text-success' : 'text-danger') + '">' + 
+                                            resultado + '</td>' +
+                                            '</tr>';
+                                    }
+                                }
+                            }
+                            
+                            resultsHtml += '</tbody></table></div></div>';
+                            $("#analysis-results").html(resultsHtml);
+                            
+                            // Remover o botão de cancelar análise para não confundir o usuário
+                            $("#cancel-analysis-btn").remove();
+                            
+                            // Adicionar botão para fechar e recarregar
+                            $("#button-container").html('<button id="close-and-reload" class="btn btn-primary" style="background: linear-gradient(90deg, #0d6efd 0%, #0dcaf0 100%); border: none; border-radius: 20px; padding: 8px 20px; box-shadow: 0 0 15px rgba(13,110,253,0.5);">Fechar e Ver Resultados</button>');
+                            
+                            // Adicionar evento ao botão
+                            $("#close-and-reload").click(function() {
+                                try {
+                                    console.log("Botão Fechar clicado, removendo overlay e recarregando página");
+                                    $("#loading-overlay").remove();
+                                    $("#analyze-top5-btn").prop('disabled', false).text('Análise Completa Inteligente');
+                                    
+                                    // Usar a mesma abordagem robusta para recarregar
+                                    console.log("Recarregando página para mostrar novos resultados");
+                                    document.location.href = document.location.href.split("#")[0] + "?t=" + new Date().getTime();
+                                } catch (e) {
+                                    console.error("Erro ao recarregar:", e);
+                                    alert("Ocorreu um erro ao atualizar a página. Por favor, clique em 'Atualizar Ranking' para ver os resultados.");
+                                }
+                            });
+                            
+                            // Atualizar a página após 3 segundos (caso o usuário não clique no botão)
+                            setTimeout(function() {
+                                try {
+                                    console.log("Recarregamento automático após análise bem-sucedida");
+                                    // Remover overlay e habilitar botão antes de recarregar
+                                    $("#loading-overlay").remove();
+                                    $("#analyze-top5-btn").prop('disabled', false).text('Análise Completa Inteligente');
+                                    
+                                    // Abordagem mais robusta para recarregar a página
+                                    console.log("Recarregando página para mostrar novos resultados");
+                                    document.location.href = document.location.href.split("#")[0] + "?t=" + new Date().getTime();
+                                } catch (e) {
+                                    console.error("Erro ao recarregar automaticamente:", e);
+                                    alert("Ocorreu um erro ao atualizar a página. Por favor, clique em 'Atualizar Ranking' para ver os resultados.");
+                                }
+                            }, 2000); // Reduzido para 2 segundos para ser mais responsivo
+                        } else {
+                            // Mostrar erro e detalhes - substituir typeWriter por .text()
+                            $("#ai-analyzing-message").text("A análise encontrou alguns problemas.");
+                            $("#progress-bar-main").removeClass("progress-bar-striped progress-bar-animated").css("background", "linear-gradient(90deg, #dc3545 0%, #ff6b6b 100%)");
+                            
+                            if (response.results) {
+                                let resultsHtml = '<div class="card bg-dark border-danger">' +
+                                    '<div class="card-header bg-danger bg-opacity-25 text-white"><i class="fas fa-exclamation-triangle me-2"></i>Detalhes do Erro</div>' +
+                                    '<div class="card-body">' +
+                                    '<table class="table table-dark table-sm border-danger">' +
+                                    '<thead><tr><th>Ativo</th><th>Resultado</th></tr></thead>' +
+                                    '<tbody>';
+                                
+                                for (const [ativo, resultado] of Object.entries(response.results)) {
+                                    const isSuccess = resultado === "Sucesso";
+                                    if (isSuccess) analyzedCount++;
+                                    
+                                    resultsHtml += '<tr>' +
+                                        '<td><i class="' + (isSuccess ? 'fas fa-check-circle text-success me-2' : 'fas fa-times-circle text-danger me-2') + '"></i>' + ativo + '</td>' +
+                                        '<td class="' + (isSuccess ? 'text-success' : 'text-danger') + '">' + 
+                                        resultado + '</td>' +
+                                        '</tr>';
+                                }
+                                
+                                resultsHtml += '</tbody></table></div></div>';
+                                $("#analysis-results").html(resultsHtml);
+                            }
+                            
+                            // Adicionar botão para fechar overlay
+                            $("#button-container").html('<button id="close-error-overlay" class="btn btn-primary" style="background: linear-gradient(90deg, #0d6efd 0%, #0dcaf0 100%); border: none; border-radius: 20px; padding: 8px 20px; box-shadow: 0 0 15px rgba(13,110,253,0.5);">Fechar</button>');
+                            
+                            // Adicionar evento ao botão
+                            $("#close-error-overlay").click(function() {
+                                try {
+                                    console.log("Fechando overlay de erro");
+                                    $("#loading-overlay").remove();
+                                    $("#analyze-top5-btn").prop('disabled', false).text('Análise Completa Inteligente');
+                                } catch (e) {
+                                    console.error("Erro ao fechar overlay:", e);
+                                    // Método alternativo para remover overlay
+                                    document.getElementById("loading-overlay").outerHTML = "";
+                                    document.getElementById("analyze-top5-btn").disabled = false;
+                                    document.getElementById("analyze-top5-btn").innerText = 'Análise Completa Inteligente';
+                                }
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        clearInterval(messageInterval); // Parar a alternância de mensagens
+                        clearInterval(progressInterval); // Parar consulta de progresso
+                        
+                        console.error("Erro na requisição AJAX:", status, error);
+                        console.log("Resposta do servidor:", xhr.responseText);
+                        
+                        // Mostrar erro de conexão - substituir typeWriter por .text()
+                        $("#ai-analyzing-message").text("A análise foi interrompida devido a um erro de conexão.");
+                        $("#progress-bar-main").removeClass("progress-bar-striped progress-bar-animated").css("background", "linear-gradient(90deg, #dc3545 0%, #ff6b6b 100%)");
+                        
+                        // Adicionar botão para fechar overlay
+                        $("#button-container").html('<button id="close-ajax-error" class="btn btn-primary" style="background: linear-gradient(90deg, #0d6efd 0%, #0dcaf0 100%); border: none; border-radius: 20px; padding: 8px 20px; box-shadow: 0 0 15px rgba(13,110,253,0.5);">Fechar</button>');
+                        
+                        // Adicionar evento ao botão
+                        $("#close-ajax-error").click(function() {
+                            try {
+                                console.log("Fechando overlay após erro AJAX");
+                                $("#loading-overlay").remove();
+                                $("#analyze-top5-btn").prop('disabled', false).text('Análise Completa Inteligente');
+                            } catch (e) {
+                                console.error("Erro ao fechar overlay após erro AJAX:", e);
+                                // Método alternativo para remover overlay
+                                document.getElementById("loading-overlay").outerHTML = "";
+                                document.getElementById("analyze-top5-btn").disabled = false;
+                                document.getElementById("analyze-top5-btn").innerText = 'Análise Completa Inteligente';
+                            }
+                        });
+                    }
+                });
+            });
+            
+            // Auto-atualizar a cada 2 minutos
+            setInterval(refreshRanking, 120000);
+            
+            // Verificar o status atual do comportamento do ranking
+            function checkRankingBehavior() {
+                $.ajax({
+                    url: "/get_analysis_progress",
+                    type: "GET",
+                    success: function(data) {
+                        const isRankingCleared = data.ranking_cleared === true;
+                        updateToggleButton(isRankingCleared);
+                    }
+                });
+            }
+            
+            // Atualizar a aparência do botão de acordo com o estado
+            function updateToggleButton(isRankingCleared) {
+                if (isRankingCleared) {
+                    $("#toggle-ranking-btn").removeClass("btn-primary").addClass("btn-info");
+                    $("#toggle-text").text("Manter Limpo");
+                } else {
+                    $("#toggle-ranking-btn").removeClass("btn-info").addClass("btn-primary");
+                    $("#toggle-text").text("Atualizar Automático");
+                }
+            }
+            
+            // Verificar comportamento ao carregar a página
+            checkRankingBehavior();
+            
+            // Botão para alternar comportamento do ranking
+            $("#toggle-ranking-btn").click(function() {
+                $(this).prop('disabled', true);
+                
+                $.ajax({
+                    url: "/toggle_ranking_behavior",
+                    type: "POST",
+                    success: function(response) {
+                        if (response.success) {
+                            updateToggleButton(response.ranking_cleared);
+                            
+                            // Mostrar toast de confirmação
+                            $("body").append(
+                                '<div class="position-fixed top-0 end-0 p-3" style="z-index: 1100">' +
+                                '<div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">' +
+                                '<div class="toast-header bg-info text-white">' +
+                                '<i class="fas fa-info-circle me-2"></i>' +
+                                '<strong class="me-auto">Configuração Alterada</strong>' +
+                                '<button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>' +
+                                '</div>' +
+                                '<div class="toast-body bg-dark text-white">' +
+                                response.message +
+                                '</div>' +
+                                '</div>' +
+                                '</div>'
+                            );
+                            
+                            // Remover toast após 3 segundos
+                            setTimeout(function() {
+                                $(".toast").fadeOut(function() { $(this).remove(); });
+                            }, 3000);
+                        } else {
+                            alert("Erro ao alterar comportamento: " + (response.error || "Erro desconhecido"));
+                        }
+                        
+                        $("#toggle-ranking-btn").prop('disabled', false);
+                    },
+                    error: function() {
+                        alert("Erro de conexão ao alterar comportamento do ranking");
+                        $("#toggle-ranking-btn").prop('disabled', false);
+                    }
+                });
+            });
+            
+            // Botão para limpar o ranking
+            $("#clear-ranking-btn").click(function() {
+                if (confirm("Tem certeza que deseja limpar o ranking dos ativos?")) {
+                    $(this).prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Limpando...');
+                    
+                    $.ajax({
+                        url: "/clear_ranking",
+                        type: "POST",
+                        success: function(response) {
+                            if (response.success) {
+                                // Exibir um alerta de sucesso
+                                $("body").append(
+                                    '<div class="position-fixed top-0 end-0 p-3" style="z-index: 1100">' +
+                                    '<div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">' +
+                                    '<div class="toast-header bg-success text-white">' +
+                                    '<i class="fas fa-check-circle me-2"></i>' +
+                                    '<strong class="me-auto">Sucesso</strong>' +
+                                    '<button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>' +
+                                    '</div>' +
+                                    '<div class="toast-body bg-dark text-white">' +
+                                    'Ranking limpo com sucesso! A página será recarregada.' +
+                                    '</div>' +
+                                    '</div>' +
+                                    '</div>'
+                                );
+                                
+                                // Recarregar a página após 1.5 segundos
+                                setTimeout(function() {
+                                    window.location.reload();
+                                }, 1500);
+                            } else {
+                                // Reativar o botão e mostrar erro
+                                $("#clear-ranking-btn").prop('disabled', false).html('<i class="fas fa-trash-alt me-2"></i>Limpar Ranking');
+                                alert("Erro ao limpar o ranking: " + (response.error || "Erro desconhecido"));
+                            }
+                        },
+                        error: function() {
+                            // Reativar o botão e mostrar erro
+                            $("#clear-ranking-btn").prop('disabled', false).html('<i class="fas fa-trash-alt me-2"></i>Limpar Ranking');
+                            alert("Erro de conexão ao tentar limpar o ranking. Tente novamente.");
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html> 
