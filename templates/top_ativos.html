@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Ranking Inteligente - Estratégia Sodré Analytics</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -20,6 +20,8 @@
         }
         .container {
             margin-top: 20px;
+            padding-left: 10px;
+            padding-right: 10px;
         }
         .card {
             background-color: rgba(20, 30, 50, 0.7);
@@ -68,11 +70,12 @@
             border: none;
             box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
             transition: all 0.3s ease;
-            color: #000;
+            color: white;
         }
         .btn-warning:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(255, 193, 7, 0.4);
+            color: white;
         }
         .btn-outline-primary {
             border-color: #0d6efd;
@@ -300,18 +303,111 @@
         }
         
         @media (max-width: 768px) {
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
             .asset-position {
-                font-size: 20px;
+                font-size: 18px;
+                padding: 10px;
             }
             .asset-name {
-                font-size: 16px;
+                font-size: 14px;
+                padding: 10px;
             }
             .win-rate {
-                font-size: 28px;
+                font-size: 24px;
             }
             .stat-value {
-                font-size: 16px;
+                font-size: 14px;
             }
+            .nav-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+                justify-content: center;
+            }
+            .nav-buttons .btn,
+            .nav-buttons .input-group,
+            .nav-buttons .form-select {
+                width: 100%;
+                margin-bottom: 5px !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+            .page-title {
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+            }
+            .badge-ai {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.8rem;
+            }
+            .refresh-button {
+                bottom: 10px;
+                right: 10px;
+                width: 50px;
+                height: 50px;
+            }
+            /* Ajustar layout de cards para tela pequena */
+            .col-md-6, .col-lg-4 {
+                width: 100%;
+            }
+            .stats-row {
+                font-size: 13px;
+                padding: 8px 10px !important;
+            }
+            .stats-row .flex-grow-1 {
+                max-width: 60%;
+            }
+            /* Esconder botão fixo em dispositivos móveis, usar apenas o botão superior */
+            .d-none.d-md-block {
+                display: none !important;
+            }
+        }
+        
+        /* Ajustes específicos para dispositivos muito pequenos */
+        @media (max-width: 576px) {
+            .page-title {
+                font-size: 1.2rem;
+            }
+            .card-header {
+                padding: 10px;
+                font-size: 14px;
+            }
+            .ai-chip {
+                margin-left: 0;
+                margin-top: 5px;
+                display: block;
+                text-align: center;
+            }
+        }
+        .btn-info {
+            background: linear-gradient(135deg, #0d6efd, #0099ff);
+            border: none;
+            box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+            transition: all 0.3s ease;
+            color: white;
+        }
+        .btn-info:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(13, 110, 253, 0.4);
+            background: linear-gradient(135deg, #0d6efd, #00ccff);
+            color: white;
+        }
+        .btn-info-disabled {
+            background: linear-gradient(135deg, #6c757d, #adb5bd);
+            border: none;
+            box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3);
+            transition: all 0.3s ease;
+            color: white;
+            opacity: 0.8;
+        }
+        .btn-info-disabled:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(108, 117, 125, 0.4);
+            background: linear-gradient(135deg, #6c757d, #adb5bd);
+            color: white;
         }
     </style>
 </head>
@@ -329,40 +425,43 @@
         
         <!-- Botões de navegação -->
         <div class="nav-buttons text-center">
-            <a href="/" class="btn btn-outline-primary">
-                <i class="fas fa-arrow-left me-2"></i>Voltar para Análise
-            </a>
-            <button id="refresh-btn" class="btn btn-success ms-2">
-                <i class="fas fa-sync-alt me-2"></i>Atualizar Ranking
-            </button>
-            
-            <button id="clear-ranking-btn" class="btn btn-danger ms-2">
-                <i class="fas fa-trash-alt me-2"></i>Limpar Ranking
-            </button>
-            
-            <button id="toggle-ranking-btn" class="btn btn-info ms-2" data-bs-toggle="tooltip" title="Controla se o ranking deve ser atualizado automaticamente após análises individuais">
-                <i class="fas fa-cog me-2"></i><span id="toggle-text">Manter Limpo</span>
-            </button>
-            
-            <div class="d-inline-block mx-2">
-                <div class="input-group">
-                    <span class="input-group-text bg-dark text-white" data-bs-toggle="tooltip" title="Mais quadrantes = Análise mais precisa, porém mais lenta">
-                        <i class="fas fa-chart-bar me-1"></i>Quadrantes
-                    </span>
-                    <select id="num_quadrantes" class="form-select bg-dark text-white" style="width: 70px;" data-bs-toggle="tooltip" title="Define quantos quadrantes históricos serão analizados para cada ativo">
-                        <option value="5">5</option>
-                        <option value="10" selected>10</option>
-                        <option value="15">15</option>
-                        <option value="20">20</option>
-                        <option value="30">30</option>
-                        <option value="50">50</option>
-                    </select>
+            <div class="row gy-2">
+                <div class="col-12 col-sm-6 col-md-3 col-lg-2">
+                    <a href="/" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-arrow-left me-2"></i>Voltar para Análise
+                    </a>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 col-lg-2">
+                    <button id="clear-ranking-btn" class="btn btn-danger w-100">
+                        <i class="fas fa-trash-alt me-2"></i>Limpar Ranking
+                    </button>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 col-lg-2">
+                    <button id="toggle-ranking-btn" class="btn btn-info w-100" data-bs-toggle="tooltip" title="Controla se o ranking deve ser atualizado automaticamente após análises individuais">
+                        <i class="fas fa-cog me-2"></i><span id="toggle-text">Atualizar Automático</span>
+                    </button>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 col-lg-3">
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark text-white w-50" data-bs-toggle="tooltip" title="Mais quadrantes = Análise mais precisa, porém mais lenta">
+                            <i class="fas fa-chart-bar me-1"></i>Quadrantes
+                        </span>
+                        <select id="num_quadrantes" class="form-select bg-dark text-white w-50" data-bs-toggle="tooltip" title="Define quantos quadrantes históricos serão analizados para cada ativo">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="15">15</option>
+                            <option value="20">20</option>
+                            <option value="30">30</option>
+                            <option value="50">50</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-12 col-lg-3">
+                    <button id="analyze-top5-btn" class="btn btn-warning w-100">
+                        <i class="fas fa-brain me-2"></i>Análise Completa Inteligente
+                    </button>
                 </div>
             </div>
-            
-            <button id="analyze-top5-btn" class="btn btn-warning ms-2">
-                <i class="fas fa-brain me-2"></i>Análise Completa Inteligente
-            </button>
         </div>
         
         <!-- Mensagem se API não estiver conectada -->
@@ -525,45 +624,41 @@
                 </div>
             {% endfor %}
         </div>
-        
-        <!-- Botão de atualização fixo -->
-        <a href="javascript:void(0)" id="refresh-btn-fixed" class="btn btn-primary btn-lg refresh-button d-none d-md-block">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
-                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
-            </svg>
-        </a>
     </div>
     
     <script>
         $(document).ready(function() {
-            // Inicializar tooltips do Bootstrap
+            // Função para atualizar o ranking
+            function refreshRanking() {
+                // Só atualizar se o botão não estiver desativado
+                if (!$("#toggle-ranking-btn").prop('disabled')) {
+                    $.ajax({
+                        url: "/refresh_ranking",
+                        type: "POST",
+                        success: function(response) {
+                            if (response.success) {
+                                // Recarregar a página para exibir o ranking atualizado
+                                location.reload();
+                            }
+                        }
+                    });
+                }
+            }
+            
+            // Configuração de tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl)
             });
+            
+            // Auto-atualizar a cada 2 minutos
+            setInterval(refreshRanking, 120000);
             
             // Função para formatar a data/hora
             function formatDateTime(timestamp) {
                 const date = new Date(timestamp * 1000);
                 return date.toLocaleTimeString();
             }
-            
-            // Atualizar o ranking com AJAX
-            function refreshRanking() {
-                $("#refresh-btn, #refresh-btn-fixed").prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Atualizando...');
-                
-                // Para garantir que a atualização mostre dados atualizados, precisamos recarregar a página
-                setTimeout(function() {
-                    window.location.reload();
-                }, 500);
-            }
-            
-            // Ativar botões de atualização
-            $("#refresh-btn, #refresh-btn-fixed").click(function(e) {
-                e.preventDefault();
-                refreshRanking();
-            });
             
             // Botão para analisar top 5 ativos automaticamente
             $("#analyze-top5-btn").click(function() {
@@ -902,11 +997,19 @@
             // Atualizar a aparência do botão de acordo com o estado
             function updateToggleButton(isRankingCleared) {
                 if (isRankingCleared) {
-                    $("#toggle-ranking-btn").removeClass("btn-primary").addClass("btn-info");
-                    $("#toggle-text").text("Manter Limpo");
-                } else {
-                    $("#toggle-ranking-btn").removeClass("btn-info").addClass("btn-primary");
+                    // Quando estiver desativado - aparência desativada
+                    $("#toggle-ranking-btn").removeClass("btn-info").addClass("btn-info-disabled");
                     $("#toggle-text").text("Atualizar Automático");
+                    
+                    // Adicionar ícone que indica desativado
+                    $("#toggle-ranking-btn i").removeClass("fa-cog").addClass("fa-power-off");
+                } else {
+                    // Quando estiver ativado - aparência ativada
+                    $("#toggle-ranking-btn").removeClass("btn-info-disabled").addClass("btn-info");
+                    $("#toggle-text").text("Atualizar Automático");
+                    
+                    // Adicionar ícone que indica ativado
+                    $("#toggle-ranking-btn i").removeClass("fa-power-off").addClass("fa-cog");
                 }
             }
             
