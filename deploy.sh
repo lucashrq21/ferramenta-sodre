@@ -57,7 +57,7 @@ nginx -t
 
 # Configurar Let's Encrypt
 echo "=== Configurando certificados SSL ==="
-certbot --nginx -d sodretradersystem.pro -d www.sodretradersystem.pro --non-interactive --agree-tos --email seu-email@example.com
+certbot --nginx -d sodretradersystem.pro -d www.sodretradersystem.pro --non-interactive --agree-tos --email lucashenriquelh2000@gmail.com
 
 # Iniciar serviços
 echo "=== Iniciando serviços ==="
