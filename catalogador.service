@@ -1,17 +1,17 @@
 [Unit]
-Description=Catalogador V1 - Aplicação Flask Escalável
+Description=Catalogador V2 - Aplicação Flask Escalável
 After=network.target redis.service
 Wants=redis.service
 
 [Service]
 User=www-data
 Group=www-data
-WorkingDirectory=/var/www/catalogador_v1
-ExecStart=/var/www/catalogador_v1/venv/bin/gunicorn -c gunicorn_conf.py estrategia_minoria:app
+WorkingDirectory=/var/www/catalogador_v2
+ExecStart=/var/www/catalogador_v2/venv/bin/gunicorn -c gunicorn_conf.py estrategia_minoria:app
 Restart=always
 RestartSec=5
-Environment="PATH=/var/www/catalogador_v1/venv/bin"
-Environment="PYTHONPATH=/var/www/catalogador_v1"
+Environment="PATH=/var/www/catalogador_v2/venv/bin"
+Environment="PYTHONPATH=/var/www/catalogador_v2"
 Environment="FLASK_APP=estrategia_minoria.py"
 Environment="FLASK_ENV=production"
 
