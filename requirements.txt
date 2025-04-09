@@ -1,7 +1,7 @@
 flask==2.2.0
 flask[async]
 werkzeug==2.2.0
-numpy==1.22.0
+numpy==2.0.0
 pandas==1.4.0
 plotly==5.5.0
 requests==2.28.2

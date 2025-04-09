@@ -22,14 +22,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger("wsgi")
 
-# Configurar diretórios adicionais
-flask_session_dir = "flask_session"
-if not os.path.exists(flask_session_dir):
-    os.makedirs(flask_session_dir)
-
-# Importar a aplicação e suas dependências
-from estrategia_minoria import app
-import routes  # Importar rotas explicitamente
+# Importar a aplicação do arquivo main.py
+from main import app
 
 # Exportar a aplicação para o servidor WSGI
-application = app 
+application = app
